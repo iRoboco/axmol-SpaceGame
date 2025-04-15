@@ -1,0 +1,26 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_textColor;
+    highp vec4 u_effectColor;
+} _31;
+
+uniform mediump sampler2D u_tex0;
+
+in highp vec2 v_texCoord;
+layout(location = 0) out highp vec4 FragColor;
+in highp vec4 v_color;
+
+void main()
+{
+    highp float dist = texture(u_tex0, v_texCoord).x;
+    highp float smoothing = fwidth(dist);
+    highp float pivot = abs(0.5 - (0.1500000059604644775390625 * _31.u_effectColor.w));
+    highp float alpha = smoothstep(pivot - smoothing, pivot + smoothing, dist);
+    highp float border = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
+    FragColor = v_color * vec4(mix(_31.u_effectColor.xyz, _31.u_textColor.xyz, vec3(border)), alpha);
+}
+

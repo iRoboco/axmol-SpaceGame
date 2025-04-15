@@ -1,0 +1,36 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_startColor;
+    highp vec4 u_endColor;
+    highp vec2 u_center;
+    highp float u_radius;
+    highp float u_expand;
+} _17;
+
+in highp vec4 v_position;
+layout(location = 0) out highp vec4 FragColor;
+
+void main()
+{
+    highp float d = distance(v_position.xy, _17.u_center) / _17.u_radius;
+    if (d <= 1.0)
+    {
+        if (d <= _17.u_expand)
+        {
+            FragColor = _17.u_startColor;
+        }
+        else
+        {
+            FragColor = mix(_17.u_startColor, _17.u_endColor, vec4((d - _17.u_expand) / (1.0 - _17.u_expand)));
+        }
+    }
+    else
+    {
+        FragColor = vec4(0.0);
+    }
+}
+

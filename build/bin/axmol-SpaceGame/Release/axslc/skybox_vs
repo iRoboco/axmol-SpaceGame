@@ -1,0 +1,17 @@
+#version 300 es
+
+layout(std140) uniform vs_ub
+{
+    mat4 u_cameraRot;
+} _13;
+
+layout(location = 0) in vec3 a_position;
+out vec3 v_reflect;
+
+void main()
+{
+    vec4 _reflect = _13.u_cameraRot * vec4(a_position, 1.0);
+    v_reflect = _reflect.xyz;
+    gl_Position = vec4(a_position.xy, 1.0, 1.0);
+}
+

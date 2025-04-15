@@ -1,0 +1,22 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+uniform mediump sampler2D u_tex0;
+
+in highp vec2 v_texCoord;
+in highp vec4 v_light;
+layout(location = 0) out highp vec4 FragColor;
+in highp vec4 v_dark;
+
+void main()
+{
+    highp vec4 texColor = texture(u_tex0, v_texCoord);
+    highp float alpha = texColor.w * v_light.w;
+    FragColor.w = alpha;
+    highp vec3 _59 = ((vec3(((texColor.w - 1.0) * v_dark.w) + 1.0) - texColor.xyz) * v_dark.xyz) + (texColor.xyz * v_light.xyz);
+    FragColor.x = _59.x;
+    FragColor.y = _59.y;
+    FragColor.z = _59.z;
+}
+

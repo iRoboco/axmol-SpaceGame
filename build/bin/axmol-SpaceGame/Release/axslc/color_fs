@@ -1,0 +1,16 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_color;
+} _12;
+
+layout(location = 0) out highp vec4 FragColor;
+
+void main()
+{
+    FragColor = _12.u_color;
+}
+

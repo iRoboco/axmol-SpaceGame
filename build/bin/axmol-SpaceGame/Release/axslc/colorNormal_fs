@@ -1,0 +1,85 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_DirLightSourceColor[1];
+    highp vec4 u_DirLightSourceDirection[1];
+    highp vec4 u_PointLightSourceColor[1];
+    highp vec4 u_PointLightSourceRangeInverse[1];
+    highp vec4 u_SpotLightSourceColor[1];
+    highp vec4 u_SpotLightSourceDirection[1];
+    highp vec4 u_SpotLightSourceInnerAngleCos[1];
+    highp vec4 u_SpotLightSourceOuterAngleCos[1];
+    highp vec4 u_SpotLightSourceRangeInverse[1];
+    highp vec3 u_AmbientLightSourceColor;
+    highp vec4 u_color;
+} _53;
+
+in highp vec3 v_normal;
+in highp vec3 v_vertexToPointLightDirection[1];
+in highp vec3 v_vertexToSpotLightDirection[1];
+layout(location = 0) out highp vec4 FragColor;
+in highp vec2 v_texCoord;
+
+highp vec3 computeLighting(highp vec3 normalVector, highp vec3 lightDirection, highp vec3 lightColor, highp float attenuation)
+{
+    highp float diffuse = max(dot(normalVector, lightDirection), 0.0);
+    highp vec3 diffuseColor = (lightColor * diffuse) * attenuation;
+    return diffuseColor;
+}
+
+void main()
+{
+    highp vec3 normal = normalize(v_normal);
+    highp vec4 combinedColor = vec4(_53.u_AmbientLightSourceColor, 1.0);
+    for (int i = 0; i < 1; i++)
+    {
+        highp vec3 lightDirection = normalize(vec3(_53.u_DirLightSourceDirection[((i * 3) + 0) / 4][((i * 3) + 0) % 4], _53.u_DirLightSourceDirection[((i * 3) + 1) / 4][((i * 3) + 1) % 4], _53.u_DirLightSourceDirection[((i * 3) + 2) / 4][((i * 3) + 2) % 4]) * 2.0);
+        highp vec3 param = normal;
+        highp vec3 param_1 = -lightDirection;
+        highp vec3 param_2 = vec3(_53.u_DirLightSourceColor[((i * 3) + 0) / 4][((i * 3) + 0) % 4], _53.u_DirLightSourceColor[((i * 3) + 1) / 4][((i * 3) + 1) % 4], _53.u_DirLightSourceColor[((i * 3) + 2) / 4][((i * 3) + 2) % 4]);
+        highp float param_3 = 1.0;
+        highp vec4 _154 = combinedColor;
+        highp vec3 _156 = _154.xyz + computeLighting(param, param_1, param_2, param_3);
+        combinedColor.x = _156.x;
+        combinedColor.y = _156.y;
+        combinedColor.z = _156.z;
+    }
+    for (int i_1 = 0; i_1 < 1; i_1++)
+    {
+        highp vec3 ldir = v_vertexToPointLightDirection[i_1] * _53.u_PointLightSourceRangeInverse[i_1 / 4][i_1 % 4];
+        highp float attenuation = clamp(1.0 - dot(ldir, ldir), 0.0, 1.0);
+        highp vec3 param_4 = normal;
+        highp vec3 param_5 = normalize(v_vertexToPointLightDirection[i_1]);
+        highp vec3 param_6 = vec3(_53.u_PointLightSourceColor[((i_1 * 3) + 0) / 4][((i_1 * 3) + 0) % 4], _53.u_PointLightSourceColor[((i_1 * 3) + 1) / 4][((i_1 * 3) + 1) % 4], _53.u_PointLightSourceColor[((i_1 * 3) + 2) / 4][((i_1 * 3) + 2) % 4]);
+        highp float param_7 = attenuation;
+        highp vec4 _237 = combinedColor;
+        highp vec3 _239 = _237.xyz + computeLighting(param_4, param_5, param_6, param_7);
+        combinedColor.x = _239.x;
+        combinedColor.y = _239.y;
+        combinedColor.z = _239.z;
+    }
+    for (int i_2 = 0; i_2 < 1; i_2++)
+    {
+        highp vec3 ldir_1 = v_vertexToSpotLightDirection[i_2] * _53.u_SpotLightSourceRangeInverse[i_2 / 4][i_2 % 4];
+        highp float attenuation_1 = clamp(1.0 - dot(ldir_1, ldir_1), 0.0, 1.0);
+        highp vec3 vertexToSpotLightDirection = normalize(v_vertexToSpotLightDirection[i_2]);
+        highp vec3 spotLightDirection = normalize(vec3(_53.u_SpotLightSourceDirection[((i_2 * 3) + 0) / 4][((i_2 * 3) + 0) % 4], _53.u_SpotLightSourceDirection[((i_2 * 3) + 1) / 4][((i_2 * 3) + 1) % 4], _53.u_SpotLightSourceDirection[((i_2 * 3) + 2) / 4][((i_2 * 3) + 2) % 4]) * 2.0);
+        highp float spotCurrentAngleCos = dot(spotLightDirection, -vertexToSpotLightDirection);
+        attenuation_1 *= smoothstep(_53.u_SpotLightSourceOuterAngleCos[i_2 / 4][i_2 % 4], _53.u_SpotLightSourceInnerAngleCos[i_2 / 4][i_2 % 4], spotCurrentAngleCos);
+        attenuation_1 = clamp(attenuation_1, 0.0, 1.0);
+        highp vec3 param_8 = normal;
+        highp vec3 param_9 = vertexToSpotLightDirection;
+        highp vec3 param_10 = vec3(_53.u_SpotLightSourceColor[((i_2 * 3) + 0) / 4][((i_2 * 3) + 0) % 4], _53.u_SpotLightSourceColor[((i_2 * 3) + 1) / 4][((i_2 * 3) + 1) % 4], _53.u_SpotLightSourceColor[((i_2 * 3) + 2) / 4][((i_2 * 3) + 2) % 4]);
+        highp float param_11 = attenuation_1;
+        highp vec4 _379 = combinedColor;
+        highp vec3 _381 = _379.xyz + computeLighting(param_8, param_9, param_10, param_11);
+        combinedColor.x = _381.x;
+        combinedColor.y = _381.y;
+        combinedColor.z = _381.z;
+    }
+    FragColor = _53.u_color * combinedColor;
+}
+

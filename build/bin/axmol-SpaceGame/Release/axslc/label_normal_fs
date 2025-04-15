@@ -1,0 +1,20 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_textColor;
+} _15;
+
+uniform mediump sampler2D u_tex0;
+
+layout(location = 0) out highp vec4 FragColor;
+in highp vec4 v_color;
+in highp vec2 v_texCoord;
+
+void main()
+{
+    FragColor = v_color * vec4(_15.u_textColor.xyz, _15.u_textColor.w * texture(u_tex0, v_texCoord).x);
+}
+

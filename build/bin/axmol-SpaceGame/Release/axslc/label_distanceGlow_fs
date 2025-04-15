@@ -1,0 +1,26 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_textColor;
+    highp vec4 u_effectColor;
+} _42;
+
+uniform mediump sampler2D u_tex0;
+
+in highp vec2 v_texCoord;
+layout(location = 0) out highp vec4 FragColor;
+in highp vec4 v_color;
+
+void main()
+{
+    highp float dist = texture(u_tex0, v_texCoord).x;
+    highp float smoothing = 0.4000000059604644775390625;
+    highp float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
+    highp float mu = smoothstep(0.5, 1.0, sqrt(dist));
+    highp vec4 color = (_42.u_effectColor * (1.0 - alpha)) + (_42.u_textColor * alpha);
+    FragColor = v_color * vec4(color.xyz, max(alpha, mu) * color.w);
+}
+

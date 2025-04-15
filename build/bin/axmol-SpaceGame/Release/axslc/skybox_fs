@@ -1,0 +1,19 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    highp vec4 u_color;
+} _22;
+
+uniform mediump samplerCube u_Env;
+
+layout(location = 0) out highp vec4 FragColor;
+in highp vec3 v_reflect;
+
+void main()
+{
+    FragColor = texture(u_Env, v_reflect) * _22.u_color;
+}
+

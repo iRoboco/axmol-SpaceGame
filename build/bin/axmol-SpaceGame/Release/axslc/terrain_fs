@@ -1,0 +1,48 @@
+#version 300 es
+precision mediump float;
+precision highp int;
+
+layout(std140) uniform fs_ub
+{
+    int u_has_alpha;
+    int u_has_light_map;
+    highp vec4 u_detailSize[1];
+    highp vec3 u_lightDir;
+} _15;
+
+uniform mediump sampler2D u_lightMap;
+uniform mediump sampler2D u_tex0;
+uniform mediump sampler2D u_alphaMap;
+uniform mediump sampler2D u_tex1;
+uniform mediump sampler2D u_tex2;
+uniform mediump sampler2D u_tex3;
+
+in highp vec2 v_texCoord;
+in highp vec3 v_normal;
+layout(location = 0) out highp vec4 FragColor;
+
+void main()
+{
+    highp vec4 lightColor;
+    if (_15.u_has_light_map <= 0)
+    {
+        lightColor = vec4(1.0);
+    }
+    else
+    {
+        lightColor = texture(u_lightMap, v_texCoord);
+    }
+    highp float lightFactor = dot(-_15.u_lightDir, v_normal);
+    if (_15.u_has_alpha <= 0)
+    {
+        FragColor = (texture(u_tex0, v_texCoord) * lightColor) * lightFactor;
+    }
+    else
+    {
+        highp vec4 blendFactor = texture(u_alphaMap, v_texCoord);
+        highp vec4 color = vec4(0.0);
+        color = (((texture(u_tex0, v_texCoord * _15.u_detailSize[0].x) * blendFactor.x) + (texture(u_tex1, v_texCoord * _15.u_detailSize[0].y) * blendFactor.y)) + (texture(u_tex2, v_texCoord * _15.u_detailSize[0].z) * blendFactor.z)) + (texture(u_tex3, v_texCoord * _15.u_detailSize[0].w) * (1.0 - blendFactor.w));
+        FragColor = vec4((color.xyz * lightColor.xyz) * lightFactor, 1.0);
+    }
+}
+
